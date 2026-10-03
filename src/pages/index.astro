@@ -1,0 +1,219 @@
+---
+// Homepage: RegMedInk dark-themed landing page with the InkBinder™
+// Protocol waitlist signup form. Submission is handled client-side by
+// calling the `joinWaitlist` Astro Action (src/actions/index.ts), which
+// sends both the confirmation and admin-notification emails via Resend.
+---
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>InkBinder™ Protocol — RegMedInk</title>
+    <meta
+      name="description"
+      content="Join the RegMedInk launch waitlist for the InkBinder™ Protocol, a clinically-minded tattoo aftercare system for studios, artists, and customers."
+    />
+  </head>
+  <body class="min-h-screen bg-ink-950 font-sans text-white antialiased">
+    <!-- Top nav / brand mark -->
+    <header class="border-b border-white/10">
+      <div class="mx-auto flex max-w-5xl items-center justify-between px-6 py-5">
+        <span class="text-sm font-semibold uppercase tracking-[0.25em] text-gold-400">
+          RegMedInk
+        </span>
+        <span class="text-xs uppercase tracking-widest text-white/40">
+          regmedink.com
+        </span>
+      </div>
+    </header>
+
+    <main>
+      <!-- Hero -->
+      <section class="mx-auto max-w-3xl px-6 pt-20 pb-10 text-center">
+        <p class="mb-4 text-xs font-semibold uppercase tracking-[0.3em] text-gold-400">
+          Launching Soon
+        </p>
+        <h1 class="text-4xl font-bold leading-tight sm:text-5xl">
+          InkBinder&trade; Protocol
+        </h1>
+        <p class="mx-auto mt-5 max-w-xl text-base leading-relaxed text-white/60 sm:text-lg">
+          A clinically-minded tattoo aftercare protocol built for studio
+          owners, artists, and the clients they care for. Be first to know
+          when it launches.
+        </p>
+      </section>
+
+      <!-- Waitlist form card -->
+      <section class="mx-auto max-w-md px-6 pb-24">
+        <div class="rounded-2xl border border-white/10 bg-ink-900 p-8 shadow-2xl shadow-black/40">
+          <h2 class="text-lg font-semibold text-white">Join the Launch List</h2>
+          <p class="mt-1 text-sm text-white/50">
+            Get notified the moment InkBinder&trade; goes live.
+          </p>
+
+          <form id="waitlist-form" class="mt-6 space-y-5" novalidate>
+            <!-- Full name -->
+            <div>
+              <label for="name" class="mb-1.5 block text-sm font-medium text-white/80">
+                Full Name
+              </label>
+              <input
+                id="name"
+                name="name"
+                type="text"
+                autocomplete="name"
+                placeholder="Jordan Ramirez"
+                class="w-full rounded-lg border border-white/15 bg-ink-950 px-4 py-2.5 text-sm text-white placeholder:text-white/30 focus:border-gold-400 focus:outline-none focus:ring-1 focus:ring-gold-400"
+              />
+              <p id="error-name" class="mt-1 text-xs text-red-400"></p>
+            </div>
+
+            <!-- Email -->
+            <div>
+              <label for="email" class="mb-1.5 block text-sm font-medium text-white/80">
+                Email Address
+              </label>
+              <input
+                id="email"
+                name="email"
+                type="email"
+                autocomplete="email"
+                placeholder="jordan@studio.com"
+                class="w-full rounded-lg border border-white/15 bg-ink-950 px-4 py-2.5 text-sm text-white placeholder:text-white/30 focus:border-gold-400 focus:outline-none focus:ring-1 focus:ring-gold-400"
+              />
+              <p id="error-email" class="mt-1 text-xs text-red-400"></p>
+            </div>
+
+            <!-- Role -->
+            <div>
+              <span class="mb-1.5 block text-sm font-medium text-white/80">I am a...</span>
+              <div class="grid grid-cols-3 gap-2">
+                <label
+                  class="cursor-pointer rounded-lg border border-white/15 bg-ink-950 px-2 py-2.5 text-center text-xs font-medium text-white/70 transition has-[:checked]:border-gold-400 has-[:checked]:bg-gold-400/10 has-[:checked]:text-gold-300"
+                >
+                  <input type="radio" name="role" value="studio_owner" class="sr-only" />
+                  Studio Owner
+                </label>
+                <label
+                  class="cursor-pointer rounded-lg border border-white/15 bg-ink-950 px-2 py-2.5 text-center text-xs font-medium text-white/70 transition has-[:checked]:border-gold-400 has-[:checked]:bg-gold-400/10 has-[:checked]:text-gold-300"
+                >
+                  <input type="radio" name="role" value="tattoo_artist" class="sr-only" />
+                  Tattoo Artist
+                </label>
+                <label
+                  class="cursor-pointer rounded-lg border border-white/15 bg-ink-950 px-2 py-2.5 text-center text-xs font-medium text-white/70 transition has-[:checked]:border-gold-400 has-[:checked]:bg-gold-400/10 has-[:checked]:text-gold-300"
+                >
+                  <input type="radio" name="role" value="customer" class="sr-only" />
+                  Customer
+                </label>
+              </div>
+              <p id="error-role" class="mt-1 text-xs text-red-400"></p>
+            </div>
+
+            <button
+              id="submit-btn"
+              type="submit"
+              class="w-full rounded-lg bg-white px-4 py-3 text-sm font-semibold text-ink-950 transition hover:bg-gold-300 disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              Join the Launch List
+            </button>
+
+            <!-- Success / error status, toggled by the script below -->
+            <p id="form-status" class="hidden" role="status" aria-live="polite"></p>
+          </form>
+        </div>
+      </section>
+    </main>
+
+    <footer class="border-t border-white/10 py-8">
+      <p class="text-center text-xs text-white/30">
+        &copy; {new Date().getFullYear()} RegMedInk. Demo build for Resend integration testing.
+      </p>
+    </footer>
+
+    <script>
+      // Client-side form handling: calls the `joinWaitlist` Astro Action
+      // instead of doing a full page navigation, so we can show inline
+      // success/validation/error states.
+      import { actions, isInputError } from 'astro:actions';
+
+      const form = document.querySelector<HTMLFormElement>('#waitlist-form');
+      const submitBtn = document.querySelector<HTMLButtonElement>('#submit-btn');
+      const statusBox = document.querySelector<HTMLParagraphElement>('#form-status');
+      const fieldErrorEls = {
+        name: document.querySelector<HTMLParagraphElement>('#error-name'),
+        email: document.querySelector<HTMLParagraphElement>('#error-email'),
+        role: document.querySelector<HTMLParagraphElement>('#error-role'),
+      };
+
+      const SUCCESS_CLASSES =
+        'mt-2 block rounded-lg border border-emerald-500/40 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-300';
+      const ERROR_CLASSES =
+        'mt-2 block rounded-lg border border-red-500/40 bg-red-500/10 px-4 py-3 text-sm text-red-300';
+
+      function clearStatus() {
+        if (!statusBox) return;
+        statusBox.className = 'hidden';
+        statusBox.textContent = '';
+        for (const el of Object.values(fieldErrorEls)) {
+          if (el) el.textContent = '';
+        }
+      }
+
+      function showStatus(message: string, kind: 'success' | 'error') {
+        if (!statusBox) return;
+        statusBox.textContent = message;
+        statusBox.className = kind === 'success' ? SUCCESS_CLASSES : ERROR_CLASSES;
+      }
+
+      form?.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        clearStatus();
+
+        if (submitBtn) {
+          submitBtn.disabled = true;
+          submitBtn.textContent = 'Submitting...';
+        }
+
+        try {
+          const formData = new FormData(form);
+          const { data, error } = await actions.joinWaitlist(formData);
+
+          if (error) {
+            // Per-field validation errors (empty name/email, bad email, no role).
+            if (isInputError(error)) {
+              const fields = error.fields;
+              if (fields.name?.[0] && fieldErrorEls.name) {
+                fieldErrorEls.name.textContent = fields.name[0];
+              }
+              if (fields.email?.[0] && fieldErrorEls.email) {
+                fieldErrorEls.email.textContent = fields.email[0];
+              }
+              if (fields.role?.[0] && fieldErrorEls.role) {
+                fieldErrorEls.role.textContent = fields.role[0];
+              }
+              showStatus('Please fix the errors above and try again.', 'error');
+            } else {
+              // Server-side failure: missing API key, Resend send failure, etc.
+              showStatus(error.message || 'Something went wrong. Please try again.', 'error');
+            }
+            return;
+          }
+
+          showStatus(data.message, 'success');
+          form.reset();
+        } catch (networkError) {
+          // Network failure reaching the server itself (offline, timeout, etc.)
+          console.error('[RegMedInk] Network error submitting waitlist form:', networkError);
+          showStatus('Network error — please check your connection and try again.', 'error');
+        } finally {
+          if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Join the Launch List';
+          }
+        }
+      });
+    </script>
+  </body>
+</html>
